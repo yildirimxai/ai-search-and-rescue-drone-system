@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this project, please cite it as below."
+title: "AI-Powered UAV System for Rapid Human Detection in Search and Rescue"
+authors:
+  - family-names: "Yıldırım"
+    given-names: "Muhammed Ali"
+type: software
+year: 2026
+month: 1
+institution:
+  name: "Gazi University, Faculty of Technology, Department of Electrical and Electronics Engineering"
+repository-code: "https://github.com/yildirimxai/ai-search-and-rescue-drone-system"
+abstract: "This repository presents an AI-powered UAV system for real-time human detection in search-and-rescue scenarios using YOLOv11n, Jetson Nano, TensorRT/DeepStream deployment workflow, and RTSP-based ground-station monitoring."
+keywords:
+  - UAV
+  - drone
+  - search and rescue
+  - human detection
+  - YOLOv11n
+  - Jetson Nano
+  - DeepStream
+  - TensorRT
+  - RTSP
+license: MIT
