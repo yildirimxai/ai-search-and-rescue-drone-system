@@ -35,7 +35,7 @@ The evaluation focused on:
 
 | Detection Sample 1 | Detection Sample 2 |
 |:---:|:---:|
-| ![Field test sample 1](../assets/field_test/detection_sample_1.jpg) | ![Field test sample 2](../assets/field_test/detection_sample_2.jpg) |
+| ![Field test sample 1](../assets/field_test/detection_sample_1.png) | ![Field test sample 2](../assets/field_test/detection_sample_2.png) |
 
 </div>
 
