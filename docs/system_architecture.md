@@ -1,9 +1,11 @@
 # System Architecture
 <div align="center">
 
-![System Architecture](assets/diagram.png)
+<img src="./assets/diagram.png" alt="System Architecture" width="900">
 
-*Overall UAV system architecture showing the relationship between the Holybro X500 V2 UAV platform, Jetson Nano onboard AI unit, RTSP-based video and detection stream, and the ground control station.*
+<br>
+
+<em>Overall UAV system architecture showing the relationship between the Holybro X500 V2 UAV platform, Jetson Nano onboard AI unit, RTSP-based video and detection stream, and the ground control station.</em>
 
 </div>
 This document describes the overall system architecture of the AI-powered UAV system developed for rapid human detection in search-and-rescue scenarios.
