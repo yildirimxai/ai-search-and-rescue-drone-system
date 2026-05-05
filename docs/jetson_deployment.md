@@ -1,5 +1,13 @@
 # Jetson Nano Deployment Notes
+## DeepStream and RTSP Pipeline
 
+<div align="center">
+
+![DeepStream RTSP Pipeline](assets/ds_diagram.jpg)
+
+*DeepStream-based real-time inference and RTSP streaming pipeline. The IMX477 camera stream is processed on the Jetson Nano, passed through the TensorRT inference stage, annotated with bounding boxes, encoded, and transmitted to the receiver computer over RTSP for live monitoring.*
+
+</div>
 This document summarizes the Jetson Nano deployment environment used for the real-time UAV-based human detection system.
 
 The deployment pipeline was tested on the Jetson Nano environment using the final YOLOv11n model trained for the `human` class.
