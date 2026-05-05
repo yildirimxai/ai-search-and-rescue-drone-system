@@ -27,7 +27,7 @@
 
 | Hardware — Holybro X500 V2 on the field | Live detection — Gazi University campus |
 |:---:|:---:|
-| ![Drone on field](assets/hardware/drone_field.jpg) | ![Detection output](assets/field_test/detection_sample_1.png) |
+| ![Drone on field](assets/hardware/drone_field.jpg) | ![Detection output](assets/field_test/detection_sample_2.png) |
 
 *Real UAV field footage — YOLOv11n detecting humans at varying altitudes with bounding boxes and confidence scores streamed to the ground station.*
 
@@ -145,7 +145,7 @@ Field tests were conducted at the Gazi University campus using real UAV footage.
 
 | Detection at medium altitude | Detection with partial visibility |
 |:---:|:---:|
-| ![Field test 1](assets/field_test/detection_sample_3.png) | ![Field test 2](assets/field_test/detection_sample_2.png) |
+| ![Field test 1](assets/field_test/detection_sample_3.png) | ![Field test 2](assets/field_test/detection_sample_1.png) |
 
 </div>
 
