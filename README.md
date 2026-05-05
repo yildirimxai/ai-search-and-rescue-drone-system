@@ -4,10 +4,11 @@
 
 **Real-time onboard human detection · Jetson Nano · YOLOv11n · TensorRT · DeepStream/RTSP deployment workflow**
 
-[![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)](https://python.org)
+[![Python](https://img.shields.io/badge/Python-3.12.12-blue?logo=python)](https://python.org)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.8.0%2Bcu126-ee4c2c?logo=pytorch)](https://pytorch.org)
 [![YOLOv11](https://img.shields.io/badge/YOLOv11n-Ultralytics-purple)](https://github.com/ultralytics/ultralytics)
 [![Jetson Nano](https://img.shields.io/badge/Jetson%20Nano-Edge%20AI-76B900?logo=nvidia)](https://developer.nvidia.com/embedded/jetson-nano)
-[![TensorRT](https://img.shields.io/badge/TensorRT-FP16-76B900?logo=nvidia)](https://developer.nvidia.com/tensorrt)
+[![DeepStream](https://img.shields.io/badge/DeepStream-6.0.1-76B900?logo=nvidia)](https://developer.nvidia.com/deepstream-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![University](https://img.shields.io/badge/Gazi%20University-EEE%20Thesis-red)](https://gazi.edu.tr)
 
@@ -15,8 +16,8 @@
 
 ---
 
-> **Bachelor's thesis project** — Gazi University, Faculty of Technology, Department of Electrical & Electronics Engineering (January 2026).  
-> **Authors:** Muhammed Ali Yıldırım  
+> **Bachelor's thesis project** — Gazi University, Faculty of Technology, Department of Electrical & Electronics Engineering, January 2026  
+> **Authors:** Muhammed Ali Yıldırım, Mohamedou Mohamedhen Vall  
 > **Advisor:** Assoc. Prof. Dr. Ayşe Demirhan
 
 ---
@@ -27,9 +28,9 @@
 
 | Hardware — Holybro X500 V2 on the field | Live detection — Gazi University campus |
 |:---:|:---:|
-| ![Drone on field](assets/hardware/drone_field.jpg) | ![Detection output](assets/field_test/detection_sample_2.png) |
+| <img src="./assets/hardware/drone_field.jpg" alt="Holybro X500 V2 UAV on the field" width="430"> | <img src="./assets/field_test/detection_sample_2.png" alt="YOLOv11n human detection output" width="430"> |
 
-*Real UAV field footage — YOLOv11n detecting humans at varying altitudes with bounding boxes and confidence scores streamed to the ground station.*
+<em>Real UAV field footage — YOLOv11n detecting humans at varying altitudes with bounding boxes and confidence scores streamed to the ground station.</em>
 
 </div>
 
@@ -37,21 +38,30 @@
 
 ## Overview
 
-This repository presents an **end-to-end UAV-based real-time human detection system** designed for search-and-rescue (SAR) scenarios. The system uses an onboard IMX477 camera and an NVIDIA Jetson Nano edge device to process aerial video, detect the `human` class with YOLO-based models, and provide annotated video to the ground control station for operator monitoring.
+This repository presents an **end-to-end UAV-based real-time human detection system** designed for search-and-rescue (SAR) scenarios.
 
-The key design principle is **operator decision support**: the AI pipeline detects candidate human targets, while the human operator performs the final confirmation. Autonomous flight control and automatic target-following are intentionally outside the scope of this work.
+The system uses an onboard **IMX477 RGB camera** and an **NVIDIA Jetson Nano 4GB edge device** to process aerial video, detect the `human` class with YOLO-based object detection models, and provide annotated video output to the ground control station for operator monitoring.
 
-### What makes this project different
+The key design principle is **operator decision support**.
 
-- **Full hardware-software integration** from UAV platform assembly to AI-assisted ground-station monitoring
-- **Domain-specific PROJECT dataset** curated from public SARD and WiSARD sources for aerial SAR conditions
-- **YOLOv8n vs YOLOv11n comparison** under consistent data splits and evaluation settings
-- **Real UAV field validation** at Gazi University campus under different altitude and partial-visibility conditions
-- **Edge-AI deployment workflow** targeting Jetson Nano, TensorRT FP16 optimization, DeepStream, and RTSP-based monitoring
+The AI pipeline detects candidate human targets, while the human operator performs the final confirmation. Autonomous flight control, automatic target following, and direct AI-based UAV control are intentionally outside the scope of this work.
+
+### Key Highlights
+
+- Full UAV hardware and AI software integration
+- Holybro X500 V2 UAV platform with Pixhawk 6C flight controller
+- Jetson Nano-based onboard human detection workflow
+- IMX477 RGB camera integration
+- YOLOv8n and YOLOv11n comparison on the curated PROJECT dataset
+- Final YOLOv11n model selected based on quantitative evaluation
+- TensorRT and DeepStream-based Jetson Nano deployment workflow
+- RTSP-based ground-station monitoring using VLC Player
+- Real UAV field validation at Gazi University campus
 
 ---
 
 ## System Architecture
+
 <div align="center">
 
 <img src="./assets/diagram.png" alt="System Architecture" width="900">
@@ -61,27 +71,37 @@ The key design principle is **operator decision support**: the AI pipeline detec
 <em>Overall UAV system architecture showing the relationship between the Holybro X500 V2 UAV platform, Jetson Nano onboard AI unit, RTSP-based video and detection stream, and the ground control station.</em>
 
 </div>
+
+The system is divided into two independent subsystems:
+
+1. **Flight-control subsystem**
+2. **AI perception and streaming subsystem**
+
 ```text
 IMX477 Camera
      │
      ▼
-Jetson Nano (onboard edge AI)
+Jetson Nano 4GB
   ├─ Frame acquisition
-  ├─ YOLOv11n human detector
-  ├─ TensorRT FP16 optimized inference workflow
+  ├─ YOLOv11n human detection
+  ├─ TensorRT FP16 deployment workflow
   ├─ Bounding-box and confidence-score overlay
-  └─ RTSP-based video output workflow
+  └─ RTSP-based video output
      │
-     ▼  (Wi-Fi / local network)
+     ▼
 Ground Control Station
   ├─ Live annotated video monitoring
   └─ QGroundControl for flight telemetry
 
-Flight control: Pixhawk 6C ← RC operator (fully manual)
-AI system: independent perception subsystem with no flight-control authority
+Flight control: Pixhawk 6C ← RC operator
+AI subsystem: Independent perception unit with no flight-control authority
 ```
 
-The AI and flight-control subsystems are **deliberately decoupled**. The Jetson Nano is used as an independent perception and streaming unit; it does not send control commands to the Pixhawk. This separation prevents the detection pipeline from compromising flight safety.
+The AI and flight-control subsystems are **deliberately decoupled**.
+
+The Jetson Nano is used as an independent perception and streaming unit. It does **not** send flight-control commands to the Pixhawk 6C. This separation prevents the detection pipeline from compromising flight safety and keeps the system modular.
+
+> **Note:** The TCP/control-related path shown in the architecture diagram refers to Jetson-side communication or monitoring/configuration flow. It does not represent autonomous flight-control authority from the AI subsystem to the Pixhawk flight controller.
 
 ---
 
@@ -89,17 +109,22 @@ The AI and flight-control subsystems are **deliberately decoupled**. The Jetson 
 
 | Component | Specification |
 |---|---|
-| Frame | Holybro X500 V2 quadcopter platform |
+| UAV frame | Holybro X500 V2 quadcopter platform |
 | Flight controller | Pixhawk 6C + PX4 firmware |
-| Motors | Holybro 2216 KV920 brushless DC motors (×4, CW/CCW configuration) |
-| ESCs | BLHeli_S 20A ESCs (×4) |
-| Edge compute | NVIDIA Jetson Nano 4GB |
-| Camera | IMX477-160 camera module, 12.3 MP, 160° diagonal FOV |
-| Battery | 14.8 V 4S LiPo, 8000 mAh, 65C |
+| Motors | Holybro 2216 KV920 brushless DC motors, CW/CCW configuration |
+| ESCs | BLHeli_S 20A ESCs |
+| Edge compute | NVIDIA Jetson Nano 4GB Developer Kit |
+| Carrier board | Waveshare carrier board |
+| Camera | IMX477 RGB camera module |
+| Battery | Profuse 8000 mAh 65C 4S LiPo |
 | Power regulation | Dedicated 5A UBEC for Jetson Nano |
-| GPS | Holybro M10 GPS module |
-| RC system | FrSky Taranis QX7 ACCESS transmitter + FrSky XM+ receiver |
-| GCS software | QGroundControl |
+| GPS | M10 GPS module |
+| RC transmitter | FrSky Taranis QX7 ACCESS |
+| RC receiver | FrSky XM+ |
+| Ground control software | QGroundControl |
+| RTSP viewer | VLC Player |
+
+The UAV is manually operated. The AI subsystem is used only for real-time human detection and visual decision support.
 
 ---
 
@@ -107,7 +132,9 @@ The AI and flight-control subsystems are **deliberately decoupled**. The Jetson 
 
 ### PROJECT Dataset — Final Model Comparison
 
-The PROJECT dataset was constructed by combining and curating samples from the public **SARD** and **WiSARD** datasets. SARD was used as a task-focused aerial human detection dataset, while RGB-only WiSARD samples were selectively included to improve environmental diversity, including forested backgrounds, partial occlusion, scale variation, and complex terrain.
+The **PROJECT dataset** was created by selecting, filtering, cleaning, and reorganizing samples from the public **SARD** and **WiSARD** datasets for the target UAV-based search-and-rescue human detection scenario.
+
+SARD was used as a task-focused aerial human detection source. RGB-only WiSARD samples were selectively included to improve environmental diversity such as forested backgrounds, partial occlusion, scale variation, and complex terrain.
 
 | Split | Images |
 |---|---:|
@@ -116,17 +143,23 @@ The PROJECT dataset was constructed by combining and curating samples from the p
 | Test | 1,979 |
 | **Total** | **19,794** |
 
+### Final comparison on PROJECT dataset
+
 | Model | Precision | Recall | mAP@0.5 | mAP@0.5:0.95 |
 |---|---:|---:|---:|---:|
 | YOLOv8n | 0.8997 | 0.7953 | 0.8433 | 0.4013 |
 | **YOLOv11n** | **0.9109** | **0.8065** | **0.8694** | **0.4481** |
 
-YOLOv11n outperformed YOLOv8n across the reported PROJECT dataset metrics. The largest gain was observed in mAP@0.5:0.95, where YOLOv11n improved from `0.4013` to `0.4481` (`+0.0468` absolute points, approximately `+11.7%` relative improvement), indicating better bounding-box localization under stricter IoU thresholds.
+YOLOv11n outperformed YOLOv8n across the reported PROJECT dataset metrics.
+
+The largest improvement was observed in `mAP@0.5:0.95`, where YOLOv11n increased the score from `0.4013` to `0.4481`. This corresponds to `+0.0468` absolute points, or approximately `+11.7%` relative improvement over YOLOv8n.
+
+This improvement is important for aerial SAR scenarios because stricter IoU thresholds better reflect bounding-box localization quality, especially for small or partially visible human targets.
 
 ### Full benchmark across datasets and configurations
 
 <details>
-<summary>Click to expand — SARD, WiSARD, PROJECT × YOLOv8/YOLOv11 × Aug/No-Aug</summary>
+<summary>Click to expand full benchmark table</summary>
 
 | Dataset | Model | Aug. | Precision | Recall | mAP@0.5 | mAP@0.5:0.95 |
 |---|---|---|---:|---:|---:|---:|
@@ -147,17 +180,70 @@ YOLOv11n outperformed YOLOv8n across the reported PROJECT dataset metrics. The l
 
 ## Field Test Results
 
-Field tests were conducted at the Gazi University campus using real UAV footage. The system was evaluated under multiple altitude/distance conditions and partial-visibility scenarios, including cases where the human target occupied a small pixel area or appeared near the image boundary.
+Field tests were conducted at the Gazi University campus using real UAV footage.
+
+The goal of field testing was to qualitatively evaluate whether the final YOLOv11n model could detect humans under realistic aerial viewing conditions.
+
+The tests included:
+
+- Different UAV altitude and distance conditions
+- Small target scale in aerial images
+- Partially visible human targets
+- Targets near image boundaries
+- Real outdoor lighting and background conditions
 
 <div align="center">
 
 | Detection at medium altitude | Detection with partial visibility |
 |:---:|:---:|
-| ![Field test 1](assets/field_test/detection_sample_3.png) | ![Field test 2](assets/field_test/detection_sample_1.png) |
+| <img src="./assets/field_test/detection_sample_3.png" alt="Field test detection sample 1" width="430"> | <img src="./assets/field_test/detection_sample_1.png" alt="Field test detection sample 2" width="430"> |
 
 </div>
 
-The field tests qualitatively confirmed that the selected YOLOv11n model could detect human targets across different target scales and challenging visibility conditions. The system is intended to support the operator by highlighting candidate targets rather than replacing human confirmation.
+The field tests qualitatively confirmed that the selected YOLOv11n model could detect human targets across different target scales and challenging visibility conditions.
+
+The system is intended to support the operator by highlighting candidate targets, not to replace human confirmation.
+
+---
+
+## DeepStream and RTSP Pipeline
+
+<div align="center">
+
+<img src="./assets/ds_diagram.jpg" alt="DeepStream RTSP Pipeline" width="1000">
+
+<br>
+
+<em>DeepStream-based real-time inference and RTSP streaming pipeline. The IMX477 camera stream is processed on the Jetson Nano, passed through the TensorRT inference stage, annotated with bounding boxes, encoded, and transmitted to the receiver computer over RTSP for live monitoring.</em>
+
+</div>
+
+The deployment workflow targets an NVIDIA Jetson Nano with an IMX477 CSI camera.
+
+The high-level deployment flow is:
+
+```text
+YOLOv11n best.pt
+        │
+        ▼
+ONNX export
+        │
+        ▼
+TensorRT engine generation on Jetson Nano
+        │
+        ▼
+DeepStream-based inference pipeline
+        │
+        ▼
+RTSP output
+        │
+        ▼
+Ground station monitoring with VLC Player
+```
+
+The processed stream was viewed at the ground station using **VLC Player**.
+
+No formal FPS or end-to-end latency measurement was recorded. Therefore, this repository does not report numerical FPS or latency values.
 
 ---
 
@@ -166,47 +252,39 @@ The field tests qualitatively confirmed that the selected YOLOv11n model could d
 ```text
 ai-search-and-rescue-drone-system/
 │
-├── training/
-│   ├── train_yolov11n.ipynb         # Main YOLOv11n training notebook (Google Colab)
-│   ├── train_yolov8n.ipynb          # YOLOv8n baseline comparison notebook
-│   ├── evaluate_models.ipynb        # Evaluation and metric comparison notebook
-│   ├── augmentation_pipeline.py     # Albumentations-based augmentation pipeline
-│   ├── dataset.yaml                 # YOLO dataset configuration
-│   └── requirements.txt
-│
-├── inference/
-│   └── predict_image_video.py       # Local YOLO inference example
-│
-├── deployment/
-│   └── README_deployment.md         # Jetson Nano, TensorRT, DeepStream, and RTSP workflow notes
-│
-├── models/
-│   ├── README.md                    # Model availability and usage notes
-│   └── model_card.md                # Final YOLOv11n model metadata and limitations
+├── assets/
+│   ├── diagram.png
+│   ├── ds_diagram.jpg
+│   ├── hardware/
+│   │   └── drone_field.jpg
+│   └── field_test/
+│       ├── detection_sample_1.png
+│       ├── detection_sample_2.png
+│       └── detection_sample_3.png
 │
 ├── dataset/
-│   ├── README_dataset.md            # Dataset construction and access policy
-│   └── prepare_dataset.py           # Optional merge/clean/split helper script
-│
-├── assets/
-│   ├── hardware/                    # UAV build and hardware integration photos
-│   ├── field_test/                  # Real flight detection screenshots
-│   ├── results/                     # Training curves, PR curves, confusion matrices
-│   └── architecture_diagram.png
+│   └── README_dataset.md
 │
 ├── docs/
-│   ├── hardware_bom.md              # Bill of materials and hardware notes
-│   ├── system_architecture.md       # Hardware/software architecture explanation
-│   ├── dataset_preparation.md       # Dataset curation and QC methodology
-│   └── field_tests.md               # Field test setup and observations
+│   ├── field_tests.md
+│   ├── hardware_bom.md
+│   ├── jetson_deployment.md
+│   └── system_architecture.md
 │
-├── README.md
+├── models/
+│   └── README.md
+│
+├── training/
+│   └── README_training.md
+│
+├── .gitignore
 ├── CITATION.cff
 ├── LICENSE
-└── .gitignore
+├── README.md
+└── requirements.txt
 ```
 
-> Note: This public repository focuses on training/evaluation code, dataset documentation, model metadata, and system-level deployment documentation. Hardware- and Jetson-specific runtime configurations may vary depending on JetPack, DeepStream, TensorRT, camera driver, and network setup.
+> This public repository focuses on documentation, training configuration, model metadata, dataset description, field-test evidence, and system-level deployment notes. Device-specific DeepStream runtime configuration files are not included in the current repository version.
 
 ---
 
@@ -215,19 +293,24 @@ ai-search-and-rescue-drone-system/
 ### 1 — Install dependencies
 
 ```bash
-pip install ultralytics opencv-python numpy matplotlib albumentations
+pip install -r requirements.txt
 ```
+
+The main development and training environment used in this project was Google Colab.
 
 For Jetson Nano deployment, use the JetPack-compatible Python, CUDA, TensorRT, and DeepStream versions provided by the NVIDIA JetPack ecosystem.
 
-### 2 — Run inference on a video or image
+### 2 — Run inference on an image or video
 
-Place the trained YOLOv11n weights under `models/weights/` or update the path below.
+The trained model weights are not included in this repository by default.
+
+If you have access to the trained `best.pt` file, place it under a local path of your choice and update the model path below.
 
 ```python
 from ultralytics import YOLO
 
-model = YOLO("models/weights/yolov11n_sar_best.pt")
+model = YOLO("path/to/best.pt")
+
 results = model.predict(
     source="your_video.mp4",
     conf=0.40,
@@ -236,7 +319,7 @@ results = model.predict(
 )
 ```
 
-> **Recommended confidence threshold: 0.40–0.45**  
+> **Recommended confidence range: 0.40–0.45**  
 > This range was selected based on confidence-threshold analysis and SAR-specific recall requirements. Higher thresholds may reduce false positives but can increase the risk of missing small or partially visible human targets.
 
 ### 3 — Export to ONNX / TensorRT
@@ -244,7 +327,7 @@ results = model.predict(
 ```python
 from ultralytics import YOLO
 
-model = YOLO("models/weights/yolov11n_sar_best.pt")
+model = YOLO("path/to/best.pt")
 
 # ONNX export
 model.export(format="onnx", imgsz=640)
@@ -254,133 +337,133 @@ model.export(format="onnx", imgsz=640)
 model.export(format="engine", imgsz=640, half=True)
 ```
 
+TensorRT engines are hardware- and software-environment dependent. For reproducibility, the TensorRT `.engine` file should be generated on the target Jetson device.
+
 ### 4 — Training from scratch
 
-Open `training/train_yolov11n.ipynb` in a Google Colab GPU runtime.
-
-A representative Ultralytics training call is shown below. Keep the same split structure when reproducing the reported comparisons.
+The final YOLOv11n model was trained in **Google Colab** using an **NVIDIA A100 GPU**.
 
 ```python
 from ultralytics import YOLO
+import os
 
-model = YOLO("yolo11n.pt")
+os.environ["WANDB_MODE"] = "disabled"
 
-model.train(
-    data="training/dataset.yaml",
+model = YOLO("yolov11n.pt")
+
+results = model.train(
+    data=str(yaml_path),
     epochs=100,
     imgsz=640,
     batch=32,
+    patience=20,
     optimizer="SGD",
     lr0=0.01,
     lrf=0.01,
     weight_decay=0.0005,
+    device=0,
+    workers=2,
+    cache=True,
+    hsv_h=0.015,
+    hsv_s=0.7,
+    hsv_v=0.4,
+    flipud=0.0,
     fliplr=0.5,
+    mosaic=1.0,
+    mixup=0.1,
+    label_smoothing=0.0,
 )
 ```
 
-> The final experimental configuration used controlled, train-only augmentation. Validation and test sets were kept unaugmented to preserve unbiased evaluation.
+Validation and test sets were kept separate from the training split to preserve unbiased evaluation.
 
 ---
 
 ## Dataset
 
-### Public sources
+### Public Dataset Sources
 
-| Dataset | Source | Notes |
+| Dataset | Link | Role in this project |
 |---|---|---|
-| SARD | Search-and-rescue-oriented aerial human detection dataset | Used as a task-focused human detection source |
-| WiSARD | Wilderness Search and Rescue Dataset | RGB-only samples were selected; thermal/LWIR images were excluded |
+| SARD — Search and Rescue Dataset | https://www.kaggle.com/datasets/nikolasgegenava/sard-search-and-rescue | Task-focused aerial human detection source |
+| WiSARD — Wilderness Search and Rescue Dataset | https://sites.google.com/uw.edu/wisard/ | Additional environmental diversity through selected RGB samples |
+| WiSARD Paper | https://arxiv.org/abs/2309.04453 | Research paper describing the WiSARD dataset |
 
-Please refer to the original dataset pages and licenses before redistribution or commercial use.
+Please refer to the original dataset pages and their usage terms before redistribution or commercial use.
 
-### PROJECT Dataset (this work)
+### PROJECT Dataset
 
-The PROJECT dataset is a curated merge of SARD and WiSARD, with the following processing steps:
+The PROJECT dataset is not a separate dataset collected from scratch.
 
-- **Modality filtering:** thermal/LWIR images were excluded; only RGB images were used.
-- **Scenario-based curation:** forest, semi-forest, occlusion, scale variation, and complex background cases were prioritized.
-- **Input standardization:** model training used a 640×640 input size; original high-resolution WiSARD RGB images were curated before training to reduce severe small-target information loss.
-- **YOLO-format label validation:** image-label pairing, coordinate bounds, class index consistency, invalid boxes, and missing files were checked.
-- **Deduplication and quality control:** duplicate or near-duplicate samples and corrupted files were removed.
-- **Train-only augmentation:** validation and test splits were kept unaugmented.
+It is a task-specific curated dataset created from SARD and selected RGB samples from WiSARD for the UAV-based search-and-rescue human detection scenario.
 
-The curated PROJECT dataset is not directly distributed in this repository due to dataset licensing and redistribution considerations. It may be shared upon reasonable academic request.
+The preparation process included:
+
+- Selecting relevant RGB samples from SARD and WiSARD
+- Excluding thermal/LWIR images because the deployed UAV system uses an RGB camera
+- Filtering samples based on search-and-rescue scenario relevance
+- Checking image-label matching
+- Validating YOLO-format annotations
+- Removing invalid or unsuitable samples
+- Creating train, validation, and test splits
+- Applying augmentation only during the training process
+
+The curated PROJECT dataset is not directly redistributed in this repository. Researchers or students who would like to reproduce the experiments or examine the curated version can contact the author.
 
 Contact: [muali.yldrm@gmail.com](mailto:muali.yldrm@gmail.com)
 
 ---
 
-## Augmentation Policy
+## Training Environment
 
-The training pipeline used controlled, realistic augmentations through Albumentations. The goal was to improve generalization while avoiding artificial compositions that do not reflect real UAV flight footage.
-
-Used augmentation categories include:
-
-- safe crop / resizing / padding
-- mild affine transformations
-- horizontal flip
-- limited perspective transformation
-- brightness and contrast changes
-- HSV jitter
-- blur, Gaussian noise, and compression artifacts
-- coarse dropout for partial-occlusion simulation
-
-The following augmentations were intentionally avoided or limited for SAR realism:
-
-- mosaic-style composite images
-- MixUp / CutMix
-- aggressive rotation or unrealistic perspective transformations
-
----
-
-## Software Stack
-
-| Component | Version / Notes |
+| Component | Version / Status |
 |---|---|
-| Python | 3.10 |
-| PyTorch | 2.x with CUDA support in Colab |
-| Ultralytics | YOLOv8 / YOLOv11 |
-| OpenCV | Video and image processing |
-| Albumentations | Train-only augmentation |
-| NVIDIA JetPack | JetPack 4.6.x target for Jetson Nano |
-| TensorRT | JetPack-compatible TensorRT runtime |
-| DeepStream SDK | Jetson-compatible DeepStream workflow |
-| GStreamer | Used through the DeepStream video pipeline |
-| QGroundControl | Ground-station telemetry and manual flight monitoring |
+| Python | 3.12.12 |
+| PyTorch | 2.8.0+cu126 |
+| Ultralytics | 8.3.0 |
+| OpenCV | 4.12 |
+| Albumentations | 2.0.8 |
+| Roboflow | Not used |
+| Training platform | Google Colab |
+| GPU | NVIDIA A100 |
 
 ---
 
-## Jetson Nano Deployment Workflow
-## DeepStream and RTSP Pipeline
+## Jetson Nano Deployment Environment
 
-<div align="center">
+| Component | Version / Status |
+|---|---|
+| Edge device | NVIDIA Jetson Nano 4GB Developer Kit |
+| Carrier board | Waveshare carrier board |
+| JetPack | 4.6.4 |
+| DeepStream SDK | 6.0.1 |
+| TensorRT | Exported on the Jetson Nano deployment environment |
+| Camera | IMX477 |
+| RTSP monitoring | Tested |
+| Ground station viewer | VLC Player |
+| FPS / latency measurement | Not formally measured |
 
-![DeepStream RTSP Pipeline](assets/ds_diagram.jpg)
-
-*DeepStream-based real-time inference and RTSP streaming pipeline. The IMX477 camera stream is processed on the Jetson Nano, passed through the TensorRT inference stage, annotated with bounding boxes, encoded, and transmitted to the receiver computer over RTSP for live monitoring.*
-
-</div>
-The system-level deployment target is an NVIDIA Jetson Nano with an IMX477 CSI camera. The deployment workflow consists of:
-
-1. Capturing frames from the IMX477 camera.
-2. Running the trained YOLOv11n model through an optimized TensorRT FP16 inference workflow.
-3. Drawing bounding boxes and confidence scores on detected human targets.
-4. Streaming the annotated video to the ground station using an RTSP-based workflow.
-5. Monitoring flight telemetry independently through QGroundControl.
-
-Platform-specific configuration files are not guaranteed to be portable across JetPack, DeepStream, camera driver, and TensorRT versions. For this reason, this repository documents the deployment workflow and keeps the training/evaluation artifacts separated from device-specific runtime configuration.
+The ONNX model was available, and the TensorRT engine was generated on the Jetson Nano deployment environment.
 
 ---
 
 ## Model Availability
 
-The final YOLOv11n `best.pt` weights exist but are not committed directly by default. To reproduce the public examples, place the weights at:
+The final YOLOv11n model file is:
 
 ```text
-models/weights/yolov11n_sar_best.pt
+best.pt
 ```
 
-The trained weights can be shared upon reasonable academic request or provided through an external release link if distribution is permitted.
+The trained weights are not included in this repository by default. They may be shared upon reasonable academic request.
+
+Available formats:
+
+| Format | Status |
+|---|---|
+| PyTorch `.pt` | Available upon reasonable academic request |
+| ONNX `.onnx` | Exported, not included in this repository by default |
+| TensorRT `.engine` | Generated on the Jetson Nano deployment environment |
 
 ---
 
@@ -389,6 +472,7 @@ The trained weights can be shared upon reasonable academic request or provided t
 - The system detects candidate human targets but does not autonomously control the UAV.
 - The model was trained on RGB data only; thermal/LWIR detection is outside the current repository scope.
 - Detection performance can degrade under extreme altitude, motion blur, heavy occlusion, severe lighting changes, or very small target pixel area.
+- FPS and end-to-end latency were not formally measured.
 - DeepStream and TensorRT deployment may require platform-specific adjustments on Jetson Nano.
 - The PROJECT dataset is curated from public sources and is not redistributed directly in this repository.
 
@@ -396,9 +480,10 @@ The trained weights can be shared upon reasonable academic request or provided t
 
 ## Future Work
 
-- Add a portable Jetson Nano deployment package with version-pinned DeepStream configuration files.
+- Add portable DeepStream configuration files for Jetson Nano.
 - Evaluate newer Jetson hardware for higher FPS and lower latency.
-- Add thermal or RGB-thermal multimodal detection support.
+- Add formal FPS and end-to-end latency measurements.
+- Add RGB-thermal multimodal detection support.
 - Extend the pipeline with geotagged detections and map-based operator alerts.
 - Improve small-target performance through tiling, higher input size, or multi-scale inference.
 
@@ -419,6 +504,8 @@ If you use this work, please cite:
   department = {Electrical and Electronics Engineering}
 }
 ```
+
+This repository also includes a [`CITATION.cff`](CITATION.cff) file for GitHub citation support.
 
 ---
 
@@ -446,6 +533,7 @@ This project uses Ultralytics YOLO models and tooling, which are subject to Ultr
 The SARD and WiSARD datasets are not redistributed in this repository and remain subject to their original dataset licenses and terms of use.
 
 The trained model weights are not included in this repository by default and may be shared upon reasonable academic request.
+
 ---
 
 <div align="center">
