@@ -52,7 +52,15 @@ The key design principle is **operator decision support**: the AI pipeline detec
 ---
 
 ## System Architecture
+<div align="center">
 
+<img src="./assets/diagram.png" alt="System Architecture" width="900">
+
+<br>
+
+<em>Overall UAV system architecture showing the relationship between the Holybro X500 V2 UAV platform, Jetson Nano onboard AI unit, RTSP-based video and detection stream, and the ground control station.</em>
+
+</div>
 ```text
 IMX477 Camera
      │
@@ -343,7 +351,15 @@ The following augmentations were intentionally avoided or limited for SAR realis
 ---
 
 ## Jetson Nano Deployment Workflow
+## DeepStream and RTSP Pipeline
 
+<div align="center">
+
+![DeepStream RTSP Pipeline](assets/ds_diagram.jpg)
+
+*DeepStream-based real-time inference and RTSP streaming pipeline. The IMX477 camera stream is processed on the Jetson Nano, passed through the TensorRT inference stage, annotated with bounding boxes, encoded, and transmitted to the receiver computer over RTSP for live monitoring.*
+
+</div>
 The system-level deployment target is an NVIDIA Jetson Nano with an IMX477 CSI camera. The deployment workflow consists of:
 
 1. Capturing frames from the IMX477 camera.
